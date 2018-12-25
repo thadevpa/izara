@@ -1,0 +1,39 @@
+service:  ${file(../config/serverless.config.yml):main_config.service_name_app}
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+provider:  
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: ap-southeast-1
+  environment:
+    dynamo_db_table: ${self:provider.stage}-log    
+  
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.dynamo_db_table}"
+
+
+functions:
+  create:
+    handler: function/create.create
+    events:
+      - http:
+          path: log/create
+          method: post
+          cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: "*"
+
+
