@@ -10,6 +10,7 @@ provider:
   environment:
     dynamo_db_table: ${self:provider.stage}-log    
   
+  
   iamRoleStatements:
     - Effect: Allow
       Action:
